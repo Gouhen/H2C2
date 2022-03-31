@@ -1,28 +1,35 @@
 from discord.ext import commands
+from discord.utils import get
 from discord_slash import SlashCommand
 import discord
+import traceback
+import sys
 #from replit import db
 import os
-#repl.it specific
-#from keep_alive import keep_alive
-import statistics
+from keep_alive import keep_alive
 import re
 
 from bracketcompute import BracketCompute
 from channelcopy import ChannelCopy
 from rale import Rale, Content, Fouet, Boude
 
-#repl.it specific
 my_secret = os.environ['DA_TOKEN']
 disabled_guilds = os.environ['disabled']
 
-
 #result = ""
-
-
 
 bot = commands.Bot(command_prefix='!', help_command=None)
 slash = SlashCommand(bot, sync_commands=True)
+
+
+
+
+#----------------------------------------------------------------------------
+#
+#   CALCUL DU BRACKET
+#
+#----------------------------------------------------------------------------
+
 
 @bot.command(name="bracket")
 async def bracket(ctx, *, args):
@@ -32,9 +39,7 @@ async def bracket(ctx, *, args):
   if not sdfre.search(args) :
     await ctx.channel.send("Ne trouve pas 'sdf'\nExemple d'utilisation :\n!bracket 100, 90, 81, 81, 81 sdf 9")
     return
-  
-  #await ctx.channel.send("1")
-
+    
   arguments = sdfre.split(args)
 
   if len(arguments) != 2:
@@ -56,72 +61,18 @@ async def bracket(ctx, *, args):
 
   trainingRoomLevel = int(arguments[1])
 
-  b = BracketCompute()# TODO (fightersList, trainingRoomLevel)
+  b = BracketCompute()# TODO ()
+  embed = b.compute(fightersList, trainingRoomLevel)
 
   
-  numberOfFighters = len(fightersList)
-
-  validFightersList = b.validFighters(fightersList, trainingRoomLevel)
-
-
-  if len(validFightersList) > 0:
-    
-    levelSet = sorted(b.span3rule(validFightersList, ctx))
-    
-    #plus haut niveau
-    maxLevel = list(b.levels.keys())[list(b.levels.values()).index(max(levelSet))]
-
-    #nombre de combattants dans le plus haut niveau et nombre autorisé
-    nbFightersAtMaxLevel = b.countFightersAtMaxLevel(validFightersList, maxLevel)
-    nbMaxAuthorized = round(numberOfFighters/2)
-    
-    #plus fort combattant
-    maxf = max(validFightersList)
-  else:
-    levelSet = []
-    nbFightersAtMaxLevel = 0
-    nbMaxAuthorized = 0
-    maxf=max(fightersList)
-
-  embed = discord.Embed(title="Calcul du bracket", color=0xFF5733)
-
-  embed.add_field(name="Caserne", value="{} combattants".format(numberOfFighters), inline=False)
-  embed.add_field(name="Salle de Formation", value="niveau {}".format(trainingRoomLevel), inline=False)
-
-  #await ctx.channel.send("Caserne "+str(numberOfFighters)+" combattants, Salle de Formation niveau "+str(trainingRoomLevel))
-  
-  if len(validFightersList):
-    embed.add_field(name="Combattants pris en compte", value=",".join(str(n) for n in validFightersList), inline=False)
-  else:
-    embed.add_field(name="Combattants pris en compte", value="Aucuns :scream:", inline=False)
-
-    
-  #si il y a plus que 3 dans le set
-  if len(levelSet) >=3:
-    embed.add_field(name="Règle des 3 niveaux", value="Combattants dans plus de 3 niveaux :scream:\n({})".format(', '.join(levelSet)), inline=False)
-    embed.add_field(name="Plus haut combattant", value="{}".format(maxf), inline=False)
-    embed.add_field(name="BRACKET", value="**{}x{}**".format(numberOfFighters, b.bracketFromAverage(maxf)), inline=False)
-    
-  elif len(levelSet) == 0 :
-    embed.add_field(name="Plus haut combattant", value="{}".format(maxf), inline=False)
-    embed.add_field(name="BRACKET", value="**{}x{}**".format(numberOfFighters, b.bracketFromAverage(maxf)), inline=False)
-    
-  elif nbFightersAtMaxLevel > nbMaxAuthorized :
-    embed.add_field(name="Combattants dans le niveau supérieur", value=":scream: : {} sur {} max\n_**note :** actuellement, ce calcul n'est pas correct. Demandez conseil à votre clan_".format(nbFightersAtMaxLevel, nbMaxAuthorized), inline=False)
-    embed.add_field(name="BRACKET", value="**{}x{}**".format(numberOfFighters, b.bracketFromAverage(maxf)), inline=False)
-    
-  else:
-    embed.add_field(name="Règle des 3 niveaux", value=":thumbsup: : {}".format(', '.join(levelSet)), inline=True)
-    
-    meanf = statistics.mean(validFightersList)
-    embed.add_field(name="Moyenne", value="{}".format(meanf), inline=False)
-    embed.add_field(name="BRACKET", value="**{}x{}**".format(numberOfFighters, b.bracketFromAverage(meanf)), inline=False)
-
-
   await ctx.channel.send(embed=embed)
 
-
-
+  
+#----------------------------------------------------------------------------
+#
+#   CALCUL DU % D'ENSEMBLE
+#
+#----------------------------------------------------------------------------
   
 
 @bot.command(name="ensemble")
@@ -146,6 +97,13 @@ async def ensemble(ctx, *, args):
   #await ctx.channel.send("**{}%**".format(round(percentage, 2)))
 
 
+    
+#----------------------------------------------------------------------------
+#
+#   LE TEST
+#
+#----------------------------------------------------------------------------
+
 
 @slash.slash(name="ping", description="Le plus beau jeu du monde")
 async def ping(ctx):
@@ -155,6 +113,11 @@ async def ping(ctx):
   await ctx.channel.send("pong")
 
 
+#----------------------------------------------------------------------------
+#
+#   LES BETISES
+#
+#----------------------------------------------------------------------------
 
 
 @bot.command(name="rale")
@@ -168,8 +131,6 @@ async def rale(ctx):
   embed.set_author(name=ctx.author.display_name+" en a gros", icon_url=ctx.author.avatar_url)
 
   await ctx.channel.send(embed=embed)
-
-
 
 
 @bot.command(name="content")
@@ -228,6 +189,11 @@ async def boude(ctx):
 
 
 
+#----------------------------------------------------------------------------
+#
+#   LA GESTION DES SALONS
+#
+#----------------------------------------------------------------------------
 
 @bot.command(name="copiersalon")
 async def copiersalon(ctx):
@@ -242,8 +208,28 @@ async def collersalon(ctx, *, arg):
   await c.pastechannel(ctx.channel, "Gouhen", arg)
   
 
+@bot.command(name="dupliquercategorie")
+async def dupliquercategorie(ctx, *, args):
+  
+  await ctx.message.delete()
+  
+  arguments = args.split()
+
+  if len(arguments) != 2:
+    await ctx.channel.send("Utilisation : !dupliquercategorie <nom ancienne catégorie> <nom nouvelle catégorie>\nExemple : !dupliquercategorie ancienne nouvelle")
+    return
+  category = get(ctx.guild.categories, name=arguments[0])
+
+  await category.clone(name=arguments[1], reason="duplicate category")
+  await ctx.author.send("Vous avez dupliqué une catégorie")
+  
 
 
+#----------------------------------------------------------------------------
+#
+#   L'AIDE
+#
+#----------------------------------------------------------------------------
 
 @bot.command(name="help")
 async def help(ctx):
@@ -261,18 +247,57 @@ async def help(ctx):
   
   await ctx.channel.send(embed=e)
 
+
+
+
+#----------------------------------------------------------------------------
+#
+#   LA GESTION D'ERREUR
+#
+#----------------------------------------------------------------------------
+  
 #@bracket.error
 #async def bracket_error(ctx, error):
 #  await ctx.channel.send("Je ne comprends pas votre demande.\nExemple d'utilisation:\n!bracket 100, 90, 81, 81, 81 sdf 9")
 
 
+@bracket.error
+async def bracket_error(ctx, error):
+  if isinstance(error, commands.MissingPermissions):
+    message = "Vous, ou moi, (le bot), n'avons pas les droits pour exécuter cette commande."
+  elif isinstance(error, commands.MissingRequiredArgument):
+    message = "Il me faut des paramètres. Exemple d'utilisation :\n!bracket 100, 90, 81, 81, 81 sdf 9"
+  else:
+    message = "Arrg! Quelque chose a foiré"
+    traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
+
+  await ctx.author.send(message)
 
 @ensemble.error
 async def ensemble_error(ctx, error):
-  await ctx.channel.send("Utilisation : !ensemble <min> <max> <tirage>\nExemple : !ensemble 12123 19198 14051")
+  if isinstance(error, commands.MissingPermissions):
+    message = "Vous, ou moi, (le bot), n'avons pas les droits pour exécuter cette commande."
+  elif isinstance(error, commands.MissingRequiredArgument):
+    message = "Il me faut des paramètres. Exemple d'utilisation :\n!ensemble <min> <max> <tirage>\nExemple concret : !ensemble 12123 19198 14051"
+  else:
+    message = "Arrg! Quelque chose a foiré"
 
+  await ctx.author.send(message)
 
+@collersalon.error
+async def collersalon_error(ctx, error):
+  await ctx.channel.send("Il me faut des paramètres")
+  
+@dupliquercategorie.error
+async def dupliquercategorie_error(ctx, error):
+  if isinstance(error, commands.MissingPermissions):
+    message = "Vous, ou moi, (le bot), n'avons pas les droits pour exécuter cette commande."
+  elif isinstance(error, commands.MissingRequiredArgument):
+    message = "Il me faut des paramètres. Exemple d'utilisation :\n!dupliquercategorie categorie-old categorie-new"
+  else:
+    message = "Arrg! Quelque chose a foiré"
 
-#repl.it specific
-#keep_alive()
+  await ctx.author.send(message)
+
+keep_alive()
 bot.run(my_secret)

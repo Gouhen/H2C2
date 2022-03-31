@@ -1,4 +1,3 @@
-#repl.it specific
 from replit import db
 
 class ChannelCopy:
