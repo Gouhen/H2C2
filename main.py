@@ -1,25 +1,27 @@
+
+import discord
 from discord.ext import commands
 from discord.utils import get
 from discord_slash import SlashCommand
-import discord
+
 import traceback
 import sys
 #from replit import db
 import os
-from keep_alive import keep_alive
+#from keep_alive import keep_alive
 import re
 
-from bracketcompute import BracketCompute
-from channelcopy import ChannelCopy
-from rale import Rale, Content, Fouet, Boude
+#from bracketcompute import BracketCompute
+#from channelcopy import ChannelCopy
+#from rale import Rale, Content, Fouet, Boude
 
 my_secret = os.environ['DA_TOKEN']
-disabled_guilds = os.environ['disabled']
+#disabled_guilds = os.environ['disabled']
 
 #result = ""
 
 bot = commands.Bot(command_prefix='!', help_command=None)
-slash = SlashCommand(bot, sync_commands=True)
+#slash = SlashCommand(bot, sync_commands=True)
 
 
 
@@ -30,7 +32,7 @@ slash = SlashCommand(bot, sync_commands=True)
 #
 #----------------------------------------------------------------------------
 
-
+'''
 @bot.command(name="bracket")
 async def bracket(ctx, *, args):
 
@@ -74,7 +76,7 @@ async def bracket(ctx, *, args):
 #
 #----------------------------------------------------------------------------
   
-
+'''
 @bot.command(name="ensemble")
 async def ensemble(ctx, *, args):
   arguments = args.split()
@@ -96,7 +98,7 @@ async def ensemble(ctx, *, args):
       await ctx.channel.send("**{}%**.   :star_struck:".format(round(percentage, 2)))
   #await ctx.channel.send("**{}%**".format(round(percentage, 2)))
 
-
+'''
     
 #----------------------------------------------------------------------------
 #
@@ -300,4 +302,7 @@ async def dupliquercategorie_error(ctx, error):
   await ctx.author.send(message)
 
 keep_alive()
+
+'''
+
 bot.run(my_secret)
