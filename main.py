@@ -2,7 +2,6 @@
 import discord
 from discord.ext import commands
 from discord.utils import get
-from discord_slash import SlashCommand
 
 import traceback
 import sys
