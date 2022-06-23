@@ -10,10 +10,12 @@ from dotenv import load_dotenv
 
 
 from bracketcompute import BracketCompute
+from rale import Rale, Content, Fouet, Boude
 
 load_dotenv()
 
 token = os.getenv("token")
+disabled_guilds = os.getenv("disabled")
 
 #client = discord.Client()
 #
@@ -109,19 +111,110 @@ async def ensemble(ctx, *, args):
   #await ctx.channel.send("**{}%**".format(round(percentage, 2)))
 
 
+#----------------------------------------------------------------------------
+#
+#   LES BETISES
+#
+#----------------------------------------------------------------------------
 
-@bot.command(name="aide")
-async def aide(ctx):
-  print(f"{ctx.author.display_name} : aide")
-  e = discord.Embed(title="Aide")
-  
-  e.add_field(name="Calcul de bracket", value="Calcule votre bracket en fonction du niveau de vos combattants et de votre salle de formation. Exemple de commande:\n**!bracket 100, 90, 81, 81, 81 sdf 9**", inline=False) 
 
-  e.add_field(name="Pourcentage sur forge d'ensemble", value="Calcule le pourcentage de bonus sur un ensemble en fonction des valeurs minimum, maximum et réelle d'un attribut. Exemple :\n**!ensemble 100 10000 5000**", inline=False)
+@bot.command(name="rale")
+async def rale(ctx):
+  if disabled_guilds == str(ctx.message.guild.id):
+    return
+  await ctx.message.delete()
+  r=Rale()
+  #await ctx.channel.send()
+  embed = discord.Embed(title=r.shout(), color=0xFF5733)
+  embed.set_author(name=ctx.author.display_name+" en a gros", icon_url=ctx.author.avatar_url)
 
-  await ctx.channel.send(embed=e)
+  await ctx.channel.send(embed=embed)
+
+
+@bot.command(name="content")
+async def content(ctx):
+  if disabled_guilds == str(ctx.message.guild.id):
+    return
+  await ctx.message.delete()
+  c=Content()
+  embed = discord.Embed(title=c.happy(), color=0x33CC00)
+  embed.set_author(name=ctx.author.display_name+" est content", icon_url=ctx.author.avatar_url)
+
+  await ctx.channel.send(embed=embed)
+
+@bot.command(name="contente")
+async def contente(ctx):
+  if disabled_guilds == str(ctx.message.guild.id):
+    return
+  await ctx.message.delete()
+  c=Content()
+
+  embed = discord.Embed(title=c.happy(), color=0x33CC00)
+  embed.set_author(name=ctx.author.display_name+" est contente", icon_url=ctx.author.avatar_url)
+
+  await ctx.channel.send(embed=embed)
+
+
+@bot.command(name="fouet")
+async def fouet(ctx):
+  if disabled_guilds == str(ctx.message.guild.id):
+    return
+  await ctx.message.delete()
+  f=Fouet()
+  embed = discord.Embed(title="", color=0xFFCC00)
+  embed.set_author(name=ctx.author.display_name+" te fouette", icon_url=ctx.author.avatar_url)
+  embed.set_image(url=f.fouette())
+
+  await ctx.channel.send(embed=embed)
+
+
+
+@bot.command(name="boude")
+async def boude(ctx):
+  if disabled_guilds == str(ctx.message.guild.id):
+    return
+  await ctx.message.delete()
+  f=Boude()
+  img_url = f.boudeuh()
+  print(img_url)
+  #await ctx.channel.send(f.boudeuh())
+  embed = discord.Embed(title="", color=0xFFCC00)
+  embed.set_author(name=ctx.author.display_name+" boude", icon_url=ctx.author.avatar_url)
+  embed.set_image(url=img_url)
+
+  await ctx.channel.send(embed=embed)
 
 #----------------------------------------------------------------------------
+#
+#   L'AIDE
+#
+#----------------------------------------------------------------------------
+
+@bot.command(name="help")
+async def help(ctx):
+  e = discord.Embed(title="Aide")
+  e.add_field(name="Calcul de bracket", value="Calcule votre bracket en fonction du niveau de vos combattants et de votre salle de formation. Exemple de commande:\n**!bracket 100, 90, 81, 81, 81 sdf 9**", inline=False) 
+  
+  e.add_field(name="Pourcentage sur forge d'ensemble", value="Calcule le pourcentage de bonus sur un ensemble en fonction des valeurs minimum, maximum et réelle d'un attribut. Exemple :\n**!ensemble 100 10000 5000**", inline=False)
+  
+  if disabled_guilds != str(ctx.message.guild.id):
+    e.add_field(name="Ping-Pong", value="Joue au ping-pong. Commande **!ping**", inline=False)
+    e.add_field(name="Fouet", value="Fouette. Commande **!fouet**", inline=False)
+    e.add_field(name="Râle", value="Exprime son mécontentement. Commande **!rale**", inline=False)
+    e.add_field(name="Boude", value="Exprime son mécontentement d'une manière plus silencieuse. Commande **!boude**", inline=False)
+    e.add_field(name="Content", value="Exprime un immense plaisir. Commande **!content** ou **!contente**", inline=False)
+  
+  await ctx.channel.send(embed=e)
+
+
+
+#----------------------------------------------------------------------------
+#
+#   LA GESTION D'ERREUR
+#
+#----------------------------------------------------------------------------
+
+
 @bracket.error
 async def bracket_error(ctx, error):
   if isinstance(error, commands.MissingPermissions):
