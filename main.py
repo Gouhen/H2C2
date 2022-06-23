@@ -7,6 +7,7 @@ import time
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+import psycopg2
 
 
 from bracketcompute import BracketCompute
@@ -36,6 +37,27 @@ disabled_guilds = os.getenv("disabled")
 bot = commands.Bot(command_prefix='!', help_command=None)
 
 
+#----------------------------------------------------------------------------
+#
+#   Initialisation de la BDD
+#
+#----------------------------------------------------------------------------
+DATABASE_URL = os.environ['DATABASE_URL']
+conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+
+cur = conn.cursor()
+cur.execute(
+"""
+CREATE TABLE IF NOT EXISTS messages (
+    id SERIAL PRIMARY KEY,
+    channel_id VARCHAR(255) NOT NULL,
+    content VARCHAR(3000) NOT NULL
+)
+"""
+)
+cur.close()
+conn.commit()
+conn.close()
 #----------------------------------------------------------------------------
 #
 #   CALCUL DU BRACKET
