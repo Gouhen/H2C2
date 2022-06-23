@@ -11,7 +11,7 @@ import psycopg2
 
 
 from bracketcompute import BracketCompute
-from rale import Rale, Content, Fouet, Boude
+from rale import Rale, Content, Fouet, Boude, Rencard
 
 load_dotenv()
 
@@ -74,7 +74,7 @@ async def bracket(ctx, *, args):
   if not sdfre.search(args) :
     await ctx.channel.send("Ne trouve pas 'sdf'\nExemple d'utilisation :\n!bracket 100, 90, 81, 81, 81 sdf 9")
     return
-    
+
   arguments = sdfre.split(args)
 
   if len(arguments) != 2:
@@ -88,7 +88,7 @@ async def bracket(ctx, *, args):
   if not fl:
     await ctx.channel.send("Ne trouve pas la liste des niveaux de combattants\nExemple d'utilisation :\n!bracket 100, 90, 81, 81, 81 sdf 9")
     return
-    
+
   fightersList = []
   for i in range(len(fl)):
     if fl[i].isdigit():
@@ -99,7 +99,7 @@ async def bracket(ctx, *, args):
   b = BracketCompute()# TODO ()
   embed = b.compute(fightersList, trainingRoomLevel)
 
-  
+
   await ctx.channel.send(embed=embed)
 
 
@@ -206,6 +206,42 @@ async def boude(ctx):
 
   await ctx.channel.send(embed=embed)
 
+
+@bot.command(name="rencard")
+async def rencard(ctx):
+  if disabled_guilds == str(ctx.message.guild.id):
+    return
+  await ctx.message.delete()
+  r=Rencard()
+  #await ctx.channel.send()
+  embed = discord.Embed(title=r.donot(), color=0xFF5733)
+  embed.set_author(name=ctx.author.display_name+" a son premier rencard depuis un moment", icon_url=ctx.author.avatar_url)
+
+  await ctx.channel.send(embed=embed)
+
+
+#----------------------------------------------------------------------------
+#
+#   LA GESTION DES SALONS
+#
+#----------------------------------------------------------------------------
+
+@bot.command(name="dupliquercategorie")
+async def dupliquercategorie(ctx, *, args):
+  
+  await ctx.message.delete()
+  
+  arguments = args.split()
+
+  if len(arguments) != 2:
+    await ctx.channel.send("Utilisation : !dupliquercategorie <nom ancienne catégorie> <nom nouvelle catégorie>\nExemple : !dupliquercategorie ancienne nouvelle")
+    return
+  category = get(ctx.guild.categories, name=arguments[0])
+
+  await category.clone(name=arguments[1], reason="duplicate category")
+  await ctx.author.send("Vous avez dupliqué une catégorie")
+
+
 #----------------------------------------------------------------------------
 #
 #   L'AIDE
@@ -215,17 +251,17 @@ async def boude(ctx):
 @bot.command(name="help")
 async def help(ctx):
   e = discord.Embed(title="Aide")
-  e.add_field(name="Calcul de bracket", value="Calcule votre bracket en fonction du niveau de vos combattants et de votre salle de formation. Exemple de commande:\n**!bracket 100, 90, 81, 81, 81 sdf 9**", inline=False) 
-  
+  e.add_field(name="Calcul de bracket", value="Calcule votre bracket en fonction du niveau de vos combattants et de votre salle de formation. Exemple de commande:\n**!bracket 100, 90, 81, 81, 81 sdf 9**", inline=False)
+
   e.add_field(name="Pourcentage sur forge d'ensemble", value="Calcule le pourcentage de bonus sur un ensemble en fonction des valeurs minimum, maximum et réelle d'un attribut. Exemple :\n**!ensemble 100 10000 5000**", inline=False)
-  
+
   if disabled_guilds != str(ctx.message.guild.id):
     e.add_field(name="Ping-Pong", value="Joue au ping-pong. Commande **!ping**", inline=False)
     e.add_field(name="Fouet", value="Fouette. Commande **!fouet**", inline=False)
     e.add_field(name="Râle", value="Exprime son mécontentement. Commande **!rale**", inline=False)
     e.add_field(name="Boude", value="Exprime son mécontentement d'une manière plus silencieuse. Commande **!boude**", inline=False)
     e.add_field(name="Content", value="Exprime un immense plaisir. Commande **!content** ou **!contente**", inline=False)
-  
+
   await ctx.channel.send(embed=e)
 
 
