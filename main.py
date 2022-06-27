@@ -11,7 +11,12 @@ import psycopg2
 
 
 from bracketcompute import BracketCompute
-from rale import Rale, Content, Fouet, Boude, Rencard, Flower
+from rale import Rale
+from content import Content
+from fouet import Fouet
+from boude import Boude
+from rencard import Rencard
+from flower import Flower
 
 load_dotenv()
 
