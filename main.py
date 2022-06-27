@@ -226,9 +226,12 @@ async def bouquet(ctx):
     return
   await ctx.message.delete()
   f=Flower()
-  #await ctx.channel.send()
-  embed = discord.Embed(title=f.potDeFlowers(), color=0xFF0000)
+  img_url = f.potDeFlowers()
+  #print(img_url)
+  #await ctx.channel.send(f.boudeuh())
+  embed = discord.Embed(title="", color=0xFFCC00)
   embed.set_author(name=ctx.author.display_name+" t'offre une joli fleur", icon_url=ctx.author.avatar_url)
+  embed.set_image(url=img_url)
 
   await ctx.channel.send(embed=embed)
 

@@ -41,8 +41,8 @@ class Boude:
 
   def boudeuh(self):
     return random.choice(self.sulk)
-    
-    
+
+
 class Rencard:
   donotsay = [ "C’est fou ce que tu ressembles à ma mère."
              , "T’inquiète, j’ai ce qu’il faut dans ma poche #clindoeilsuperlourd"
@@ -79,6 +79,10 @@ class Rencard:
 
   def donot(self):
     return random.choice(self.donotsay)
+
+
+
+
 class Flower:
     potDeFlowers = [ "https://www.atozflowers.com/wp-content/uploads/2019/02/800px-Lycoris_radiata_-_Kinchakuda_2018_-_2.jpg"
                    , "https://www.atozflowers.com/wp-content/uploads/2017/11/Magnolia_flower_Duke_campus-1024x640.jpg"
