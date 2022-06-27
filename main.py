@@ -220,18 +220,16 @@ async def rencard(ctx):
   await ctx.channel.send(embed=embed)
 
 
+
 @bot.command(name="bouquet")
 async def bouquet(ctx):
   if disabled_guilds == str(ctx.message.guild.id):
     return
   await ctx.message.delete()
   f=Flower()
-  img_url = f.potDeFlowers()
-  #print(img_url)
-  #await ctx.channel.send(f.boudeuh())
-  embed = discord.Embed(title="", color=0xFFCC00)
-  embed.set_author(name=ctx.author.display_name+" t'offre une joli fleur", icon_url=ctx.author.avatar_url)
-  embed.set_image(url=img_url)
+  embed = discord.Embed(title="", color=0xFF0000)
+  embed.set_author(name=ctx.author.display_name+" t'offre une zouli fleur", icon_url=ctx.author.avatar_url)
+  embed.set_image(url=f.flowers())
 
   await ctx.channel.send(embed=embed)
 
