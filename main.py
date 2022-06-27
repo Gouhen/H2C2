@@ -42,22 +42,22 @@ bot = commands.Bot(command_prefix='!', help_command=None)
 #   Initialisation de la BDD
 #
 #----------------------------------------------------------------------------
-DATABASE_URL = os.environ['DATABASE_URL']
-conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+#DATABASE_URL = os.environ['DATABASE_URL']
+#conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
-cur = conn.cursor()
-cur.execute(
-"""
-CREATE TABLE IF NOT EXISTS messages (
-    id SERIAL PRIMARY KEY,
-    channel_id VARCHAR(255) NOT NULL,
-    content VARCHAR(3000) NOT NULL
-)
-"""
-)
-cur.close()
-conn.commit()
-conn.close()
+#cur = conn.cursor()
+#cur.execute(
+#"""
+#CREATE TABLE IF NOT EXISTS messages (
+#    id SERIAL PRIMARY KEY,
+#    channel_id VARCHAR(255) NOT NULL,
+#    content VARCHAR(3000) NOT NULL
+#)
+#"""
+#)
+#cur.close()
+#conn.commit()
+#conn.close()
 #----------------------------------------------------------------------------
 #
 #   CALCUL DU BRACKET
@@ -227,7 +227,7 @@ async def bouquet(ctx):
   await ctx.message.delete()
   f=Flower()
   #await ctx.channel.send()
-  embed = discord.Embed(title=f.potDeFlower(), color=0xFF0000)
+  embed = discord.Embed(title=f.potDeFlowers(), color=0xFF0000)
   embed.set_author(name=ctx.author.display_name+" t'offre une joli fleur", icon_url=ctx.author.avatar_url)
 
   await ctx.channel.send(embed=embed)
