@@ -220,6 +220,19 @@ async def rencard(ctx):
   await ctx.channel.send(embed=embed)
 
 
+@bot.command(name="bouquet")
+async def bouquet(ctx):
+  if disabled_guilds == str(ctx.message.guild.id):
+    return
+  await ctx.message.delete()
+  f=Flower()
+  #await ctx.channel.send()
+  embed = discord.Embed(title=f.potDeFlower(), color=0xFF0000)
+  embed.set_author(name=ctx.author.display_name+" t'offre une joli fleur", icon_url=ctx.author.avatar_url)
+
+  await ctx.channel.send(embed=embed)
+
+
 #----------------------------------------------------------------------------
 #
 #   LA GESTION DES SALONS
@@ -248,8 +261,8 @@ async def dupliquercategorie(ctx, *, args):
 #
 #----------------------------------------------------------------------------
 
-@bot.command(name="help")
-async def help(ctx):
+@bot.command(name="aide")
+async def aide(ctx):
   e = discord.Embed(title="Aide")
   e.add_field(name="Calcul de bracket", value="Calcule votre bracket en fonction du niveau de vos combattants et de votre salle de formation. Exemple de commande:\n**!bracket 100, 90, 81, 81, 81 sdf 9**", inline=False)
 
