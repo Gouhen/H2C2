@@ -275,11 +275,11 @@ async def aide(ctx):
   e.add_field(name="Pourcentage sur forge d'ensemble", value="Calcule le pourcentage de bonus sur un ensemble en fonction des valeurs minimum, maximum et réelle d'un attribut. Exemple :\n**!ensemble 100 10000 5000**", inline=False)
 
   if disabled_guilds != str(ctx.message.guild.id):
-    e.add_field(name="Ping-Pong", value="Joue au ping-pong. Commande **!ping**", inline=False)
     e.add_field(name="Fouet", value="Fouette. Commande **!fouet**", inline=False)
     e.add_field(name="Râle", value="Exprime son mécontentement. Commande **!rale**", inline=False)
     e.add_field(name="Boude", value="Exprime son mécontentement d'une manière plus silencieuse. Commande **!boude**", inline=False)
     e.add_field(name="Content", value="Exprime un immense plaisir. Commande **!content** ou **!contente**", inline=False)
+    e.add_field(name="Bouquet", value="Pour offrir un pot d'flowers. Commande **!bouquet**", inline=False)
 
   await ctx.channel.send(embed=e)
 
