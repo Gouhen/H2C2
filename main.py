@@ -35,7 +35,7 @@ class h2g2client(discord.Client):
     async def on_ready(self):
         await self.wait_until_ready()
         if not self.synced:
-            await tree.sync(guild=discord.Object(id = 842734051458416650))
+            await tree.sync()
             self.synced = True
         print(f"{self.user} connecté")
 
@@ -50,7 +50,7 @@ tree = app_commands.CommandTree(client)
 #
 #----------------------------------------------------------------------------
 
-@tree.command(name = "content", description="Exprimer sa joie au masculin", guild=discord.Object(id = 842734051458416650))
+@tree.command(name = "content", description="Exprimer sa joie au masculin", )
 async def self(interaction: discord.Interaction):
 
     c=Content()
@@ -61,7 +61,7 @@ async def self(interaction: discord.Interaction):
     await interaction.response.send_message(embed=embed)
 
 
-@tree.command(name = "contente", description="Exprimer sa joie au féminin", guild=discord.Object(id = 842734051458416650))
+@tree.command(name = "contente", description="Exprimer sa joie au féminin", )
 async def self(interaction: discord.Interaction):
 
     c=Content()
@@ -72,7 +72,7 @@ async def self(interaction: discord.Interaction):
     await interaction.response.send_message(embed=embed)
 
 
-@tree.command(name = "fouet", description="Rendre la justice!", guild=discord.Object(id = 842734051458416650))
+@tree.command(name = "fouet", description="Rendre la justice!", )
 async def self(interaction: discord.Interaction, destinataire:Optional[discord.Member] = None):
 
     if destinataire:
@@ -88,7 +88,7 @@ async def self(interaction: discord.Interaction, destinataire:Optional[discord.M
     await interaction.response.send_message(embed=embed)
 
 
-@tree.command(name = "boude", description="Exprimer son mécontentement silencieusement", guild=discord.Object(id = 842734051458416650))
+@tree.command(name = "boude", description="Exprimer son mécontentement silencieusement", )
 async def self(interaction: discord.Interaction):
 
     f=Boude()
@@ -101,7 +101,7 @@ async def self(interaction: discord.Interaction):
     await interaction.response.send_message(embed=embed)
 
 
-@tree.command(name = "rencard", description="Mais que dire lors de ton prochain rencard?", guild=discord.Object(id = 842734051458416650))
+@tree.command(name = "rencard", description="Mais que dire lors de ton prochain rencard?", )
 async def self(interaction: discord.Interaction):
 
     r=Rencard()
@@ -112,7 +112,7 @@ async def self(interaction: discord.Interaction):
     await interaction.response.send_message(embed=embed)
 
 
-@tree.command(name = "bouquet", description="Offrir une belle fleur", guild=discord.Object(id = 842734051458416650))
+@tree.command(name = "bouquet", description="Offrir une belle fleur", )
 async def self(interaction: discord.Interaction, destinataire:Optional[discord.Member] = None):
 
     if destinataire:
@@ -129,7 +129,7 @@ async def self(interaction: discord.Interaction, destinataire:Optional[discord.M
     await interaction.response.send_message(embed=embed)
 
 
-@tree.command(name = "rale", description="Exprimer son mécontentement", guild=discord.Object(id = 842734051458416650))
+@tree.command(name = "rale", description="Exprimer son mécontentement", )
 async def self(interaction: discord.Interaction):
 
     r=Rale()
@@ -146,7 +146,7 @@ async def self(interaction: discord.Interaction):
 #
 #----------------------------------------------------------------------------
 
-@tree.command(name = "bracket", description="calculer un bracket d'arène", guild=discord.Object(id = 842734051458416650))
+@tree.command(name = "bracket", description="calculer un bracket d'arène", )
 @app_commands.rename(levels='niveaux', training_room='salle_de_formation')
 @app_commands.describe(levels='Niveaux des combattants séparés par des espaces. Exemple : 100 90 81 81 81', training_room='Niveau de la salle de formation. Exemple : 9')
 async def self(interaction: discord.Interaction, levels:str, training_room:int):
@@ -178,7 +178,7 @@ async def self(interaction: discord.Interaction, levels:str, training_room:int):
 #
 #----------------------------------------------------------------------------
 
-@tree.command(name = "ensemble", description="calcul du pourcentage de bonus d'un ensemble", guild=discord.Object(id = 842734051458416650))
+@tree.command(name = "ensemble", description="calcul du pourcentage de bonus d'un ensemble", )
 @app_commands.rename(min='minimum', max='maximum', value='valeur')
 @app_commands.describe(min="minimum possible d'un attribut (dans l'écran de droite)", max="maximum possible d'un attribut (dans l'écran de droite)", value="valeur de l'attribut (dans l'écran de gauche)")
 async def self(interaction: discord.Interaction, min:int, max:int, value:int):
@@ -205,7 +205,7 @@ async def self(interaction: discord.Interaction, min:int, max:int, value:int):
 #----------------------------------------------------------------------------
 
 
-@tree.command(name = "copiersalon", description="Copier les 50 derniers messages du salon", guild=discord.Object(id = 842734051458416650))
+@tree.command(name = "copiersalon", description="Copier les 50 derniers messages du salon", )
 async def self(interaction: discord.Interaction):
 
     if not interaction.user.guild_permissions.manage_channels:
@@ -216,7 +216,7 @@ async def self(interaction: discord.Interaction):
     await c.copychannel(interaction)
 
 
-@tree.command(name = "collersalon", description="Copier les 50 derniers messages du salon", guild=discord.Object(id = 842734051458416650))
+@tree.command(name = "collersalon", description="Copier les 50 derniers messages du salon", )
 @app_commands.rename(room_id='identifiant')
 @app_commands.describe(room_id='identifiant du salon copié préalablement')
 async def self(interaction: discord.Interaction, room_id:int):
@@ -231,7 +231,7 @@ async def self(interaction: discord.Interaction, room_id:int):
 
 
 
-@tree.command(name = "dupliquercategorie", description="Duplique une catégorie existante, avec les droits et tout", guild=discord.Object(id = 842734051458416650))
+@tree.command(name = "dupliquercategorie", description="Duplique une catégorie existante, avec les droits et tout", )
 async def self(interaction: discord.Interaction, categorie_existante:str, nom_nouvelle_categorie:str):
 
     if not interaction.user.guild_permissions.manage_channels:
