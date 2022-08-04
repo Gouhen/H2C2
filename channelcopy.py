@@ -5,10 +5,10 @@ import psycopg2
 
 class ChannelCopy:
 
-  async def copychannel(self, channel, author):
+  async def copychannel(self, interaction):
     time.sleep(1)
     #channel = client.get_channel(123456789101112131)
-    messages = await channel.history(limit=50, oldest_first=True).flatten()
+    messages = await interaction.channel.history(limit=50, oldest_first=True).flatten()
 
     count = 0
     tuples = []
@@ -41,16 +41,16 @@ class ChannelCopy:
             #TODO tester un truc genre
             #args_str = ','.join(cur.mogrify("(%s,%s)", x) for x in tuples)
             #cur.execute("INSERT INTO messages VALUES " + args_str)
-            await author.send(f"Vous avez enregistré {count} messages du salon {channel.id}. Pour les coller quelque part, utilisez la commande :\n!collersalon {channel.id}")
+            await interaction.response.send_message(f"Vous avez enregistré {count} messages du salon {channel.id}. Pour les coller quelque part, utilisez la commande :\n!collersalon {channel.id}", ephemeral=True)
 
         except (Exception, psycopg2.DatabaseError) as error:
-            await author.send(f"Problème lors de la copie du salon : {error}")
+            await interaction.response.send_message(f"Problème lors de la copie du salon : {error}", ephemeral=True)
         finally:
             if conn is not None:
                 conn.close()
     time.sleep(1)
 
-  async def pastechannel(self, channel, author, recordId):
+  async def pastechannel(self, interaction, recordId):
     DATABASE_URL = os.environ['DATABASE_URL']
     try:
         conn = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -60,13 +60,13 @@ class ChannelCopy:
         for message in records:
             if message:
                 time.sleep(1)
-                await channel.send(message[0])
+                await interaction.channel.send(message[0])
 
         cur.execute("DELETE FROM messages WHERE channel_id = %s", (recordId,))
         cur.close()
 
     except (Exception, psycopg2.DatabaseError) as error:
-        await author.send(f"Problème lors de la récupération des messages : {error}")
+        await interaction.response.send_message(f"Problème lors de la récupération des messages : {error}", ephemeral=True)
     finally:
         if conn is not None:
             conn.close()

@@ -3,9 +3,11 @@ import os
 import shlex
 import re
 import time
+from typing import Optional
 
 import discord
 from discord.ext import commands
+from discord import app_commands
 from dotenv import load_dotenv
 import psycopg2
 
@@ -24,24 +26,227 @@ load_dotenv()
 token = os.getenv("token")
 disabled_guilds = os.getenv("disabled")
 
-#client = discord.Client()
-#
-#@client.event
-#async def on_ready():
-## Print this when the bot starts up for the first time.
-#    print(f'{client.user} has connected to Discord!')
-#
-#@client.event
-#async def on_message(message):
-## Ignore messages from the bot itself so that there's no conflict.
-#    if message.author == client.user:
-#        return
-## Respond to hello.
-#    if message.content == 'coucou':
-#        await message.channel.send("Wesh gros!")
-#
-bot = commands.Bot(command_prefix='!', help_command=None)
 
+class h2g2client(discord.Client):
+    def __init__(self):
+        super().__init__(intents=discord.Intents.default())
+        self.synced = False
+
+    async def on_ready(self):
+        await self.wait_until_ready()
+        if not self.synced:
+            await tree.sync(guild=discord.Object(id = 842734051458416650))
+            self.synced = True
+        print(f"{self.user} connecté")
+
+client = h2g2client()
+tree = app_commands.CommandTree(client)
+
+
+
+#----------------------------------------------------------------------------
+#
+#   LES BETISES
+#
+#----------------------------------------------------------------------------
+
+@tree.command(name = "content", description="Exprimer sa joie au masculin", guild=discord.Object(id = 842734051458416650))
+async def self(interaction: discord.Interaction):
+
+    c=Content()
+
+    embed = discord.Embed(title=c.happy(), color=0x33CC00)
+    embed.set_author(name=f"{interaction.user.display_name} est content!", icon_url=interaction.user.display_avatar)
+
+    await interaction.response.send_message(embed=embed)
+
+
+@tree.command(name = "contente", description="Exprimer sa joie au féminin", guild=discord.Object(id = 842734051458416650))
+async def self(interaction: discord.Interaction):
+
+    c=Content()
+
+    embed = discord.Embed(title=c.happy(), color=0x33CC00)
+    embed.set_author(name=f"{interaction.user.display_name} est contente!", icon_url=interaction.user.display_avatar)
+
+    await interaction.response.send_message(embed=embed)
+
+
+@tree.command(name = "fouet", description="Rendre la justice!", guild=discord.Object(id = 842734051458416650))
+async def self(interaction: discord.Interaction, destinataire:Optional[discord.Member] = None):
+
+    if destinataire:
+        message = f"{interaction.user.display_name} fouette {destinataire.display_name}, parce que c'est mérité!"
+    else:
+        message = f"{interaction.user.display_name} te fouette!"
+
+    f=Fouet()
+    embed = discord.Embed(title="", color=0xFFCC00)
+    embed.set_author(name=message, icon_url=interaction.user.display_avatar)
+    embed.set_image(url=f.fouette())
+
+    await interaction.response.send_message(embed=embed)
+
+
+@tree.command(name = "boude", description="Exprimer son mécontentement silencieusement", guild=discord.Object(id = 842734051458416650))
+async def self(interaction: discord.Interaction):
+
+    f=Boude()
+    img_url = f.boudeuh()
+
+    embed = discord.Embed(title="", color=0xFFCC00)
+    embed.set_author(name=f"{interaction.user.display_name} boude", icon_url=interaction.user.display_avatar)
+    embed.set_image(url=img_url)
+
+    await interaction.response.send_message(embed=embed)
+
+
+@tree.command(name = "rencard", description="Mais que dire lors de ton prochain rencard?", guild=discord.Object(id = 842734051458416650))
+async def self(interaction: discord.Interaction):
+
+    r=Rencard()
+
+    embed = discord.Embed(title=r.donot(), color=0xFF5733)
+    embed.set_author(name=f"{interaction.user.display_name} a son premier rencard depuis un moment", icon_url=interaction.user.display_avatar)
+
+    await interaction.response.send_message(embed=embed)
+
+
+@tree.command(name = "bouquet", description="Offrir une belle fleur", guild=discord.Object(id = 842734051458416650))
+async def self(interaction: discord.Interaction, destinataire:Optional[discord.Member] = None):
+
+    if destinataire:
+        message = f"Tiens {destinataire.display_name}, voilà une zouli fleur de la part de {interaction.user.display_name}!"
+    else:
+        message = f"{interaction.user.display_name} vous offre une zouli fleur!"
+
+    f=Flower()
+
+    embed = discord.Embed(title="", color=0xFF0000)
+    embed.set_author(name=message, icon_url=interaction.user.display_avatar)
+    embed.set_image(url=f.flowers())
+
+    await interaction.response.send_message(embed=embed)
+
+
+@tree.command(name = "rale", description="Exprimer son mécontentement", guild=discord.Object(id = 842734051458416650))
+async def self(interaction: discord.Interaction):
+
+    r=Rale()
+
+    embed = discord.Embed(title=r.shout(), color=0xFF5733)
+    embed.set_author(name=f"{interaction.user.display_name} en a gros", icon_url=interaction.user.display_avatar)
+
+    await interaction.response.send_message(embed=embed)
+
+
+#----------------------------------------------------------------------------
+#
+#   CALCUL DU BRACKET
+#
+#----------------------------------------------------------------------------
+
+@tree.command(name = "bracket", description="calculer un bracket d'arène", guild=discord.Object(id = 842734051458416650))
+@app_commands.rename(levels='niveaux', training_room='salle_de_formation')
+@app_commands.describe(levels='Niveaux des combattants séparés par des espaces. Exemple : 100 90 81 81 81', training_room='Niveau de la salle de formation. Exemple : 9')
+async def self(interaction: discord.Interaction, levels:str, training_room:int):
+
+    spacere = re.compile("\s*,\s*|\s+")
+    fl = spacere.split(levels)
+    #await ctx.channel.send(fl)
+
+
+    fightersList = []
+    for i in range(len(fl)):
+        if fl[i].isdigit():
+            fightersList.append(int(fl[i]))
+
+    if not fightersList:
+        await interaction.response.send_message("Je ne trouve pas la liste des niveaux de combattants\nExemple d'utilisation :\n/bracket puis 100 90 81 81 81 dans niveaux, puis 9 dans salle de formation", ephemeral=True)
+        return
+
+    b = BracketCompute()# TODO ()
+    embed = b.compute(fightersList, training_room)
+
+
+    await interaction.response.send_message(embed=embed)
+
+
+#----------------------------------------------------------------------------
+#
+#   CALCUL DU % D'ENSEMBLE
+#
+#----------------------------------------------------------------------------
+
+@tree.command(name = "ensemble", description="calcul du pourcentage de bonus d'un ensemble", guild=discord.Object(id = 842734051458416650))
+@app_commands.rename(min='minimum', max='maximum', value='valeur')
+@app_commands.describe(min="minimum possible d'un attribut (dans l'écran de droite)", max="maximum possible d'un attribut (dans l'écran de droite)", value="valeur de l'attribut (dans l'écran de gauche)")
+async def self(interaction: discord.Interaction, min:int, max:int, value:int):
+
+    percentage = round((value-min)*100.0 / (max-min), 2)
+
+    if percentage < 30:
+        message = f"**{percentage}%**.   :scream:"
+    elif percentage < 60:
+        message = f"**{percentage}%**.   :slight_smile:"
+    elif percentage < 80:
+        message = f"**{percentage}%**.   :grinning:"
+    else:
+        message = f"**{percentage}%**.   :star_struck:"
+
+    await interaction.response.send_message(message)
+
+
+
+#----------------------------------------------------------------------------
+#
+#   LA GESTION DES SALONS
+#
+#----------------------------------------------------------------------------
+
+
+@tree.command(name = "copiersalon", description="Copier les 50 derniers messages du salon", guild=discord.Object(id = 842734051458416650))
+async def self(interaction: discord.Interaction):
+
+    if not interaction.user.guild_permissions.manage_channels:
+        await interaction.response.send_message("Vous n'avez pas les droits pour utiliser cette commande", ephemeral=True)
+        return
+
+    c = ChannelCopy()
+    await c.copychannel(interaction)
+
+
+@tree.command(name = "collersalon", description="Copier les 50 derniers messages du salon", guild=discord.Object(id = 842734051458416650))
+@app_commands.rename(room_id='identifiant')
+@app_commands.describe(room_id='identifiant du salon copié préalablement')
+async def self(interaction: discord.Interaction, room_id:int):
+
+
+    if not interaction.user.guild_permissions.manage_channels:
+        await interaction.response.send_message("Vous n'avez pas les droits pour utiliser cette commande", ephemeral=True)
+        return
+
+    c = ChannelCopy()
+    await c.pastechannel(interaction, room_id)
+
+
+
+@tree.command(name = "dupliquercategorie", description="Duplique une catégorie existante, avec les droits et tout", guild=discord.Object(id = 842734051458416650))
+async def self(interaction: discord.Interaction, categorie_existante:str, nom_nouvelle_categorie:str):
+
+    if not interaction.user.guild_permissions.manage_channels:
+        await interaction.response.send_message("Vous n'avez pas les droits pour utiliser cette commande", ephemeral=True)
+        return
+
+    category = get(interaction.guild.categories, name=categorie_existante)
+
+    await category.clone(name=nom_nouvelle_categorie, reason="duplicate category")
+    await interaction.response.send_message("Vous avez dupliqué une catégorie", ephemeral=True)
+
+
+
+
+client.run(token)
 
 #----------------------------------------------------------------------------
 #
@@ -83,285 +288,6 @@ def create_tables():
             conn.close()
 
 
-#----------------------------------------------------------------------------
-#
-#   LA GESTION DES SALONS
-#
-#----------------------------------------------------------------------------
 
-@bot.command(name="copiersalon")
-async def copiersalon(ctx):
-  print(f"{ctx.author.display_name} : copiersalon")
-
-  if ctx.message.guild :
-    await ctx.message.delete()
-  time.sleep(1)
-  c = ChannelCopy()
-  await c.copychannel(ctx.channel, ctx.author)
-  
-#----------------------------------------------------------------------------
-@bot.command(name="collersalon")
-async def collersalon(ctx, *, arg):
-  print(f"{ctx.author.display_name} : collersalon")
-  #if ctx.message.guild :
-  #  await ctx.message.delete()
-  #  time.sleep(1)
-  c = ChannelCopy()
-  await c.pastechannel(ctx.channel, ctx.author, arg)
-
-
-#----------------------------------------------------------------------------
-#
-#   CALCUL DU BRACKET
-#
-#----------------------------------------------------------------------------
-
-
-@bot.command(name="bracket")
-async def bracket(ctx, *, args):
-  print(f"{ctx.author.display_name} : bracket")
-
-  #await ctx.channel.send("debug en cours")
-  sdfre = re.compile("\s*sdf\s*=*")
-  if not sdfre.search(args) :
-    await ctx.channel.send("Ne trouve pas 'sdf'\nExemple d'utilisation :\n!bracket 100, 90, 81, 81, 81 sdf 9")
-    return
-
-  arguments = sdfre.split(args)
-
-  if len(arguments) != 2:
-    await ctx.channel.send("Ne trouve pas 'sdf'\nExemple d'utilisation :\n!bracket 100, 90, 81, 81, 81 sdf 9")
-    return
-
-  #await ctx.channel.send("2")
-  spacere = re.compile("\s*,\s*|\s+")
-  fl = spacere.split(arguments[0])
-  #await ctx.channel.send(fl)
-  if not fl:
-    await ctx.channel.send("Ne trouve pas la liste des niveaux de combattants\nExemple d'utilisation :\n!bracket 100, 90, 81, 81, 81 sdf 9")
-    return
-
-  fightersList = []
-  for i in range(len(fl)):
-    if fl[i].isdigit():
-      fightersList.append(int(fl[i]))
-
-  trainingRoomLevel = int(arguments[1])
-
-  b = BracketCompute()# TODO ()
-  embed = b.compute(fightersList, trainingRoomLevel)
-
-
-  await ctx.channel.send(embed=embed)
-
-
-#----------------------------------------------------------------------------
-#
-#   CALCUL DU % D'ENSEMBLE
-#
-#----------------------------------------------------------------------------
-
-
-@bot.command(name="ensemble")
-async def ensemble(ctx, *, args):
-  print(f"{ctx.author.display_name} : ensemble")
-  arguments = args.split()
-
-  if len(arguments) != 3:
-    await ctx.channel.send("Utilisation : !ensemble <min> <max> <tirage>\nExemple : !ensemble 12123 19198 14051")
-    return
-  #(valeur-min) * 100 / (max - min)
-  arguments = list(map(float, arguments))
-  min, max, value = arguments
-  percentage = (value-min)*100.0 / (max-min)
-  if percentage < 30:
-      await ctx.channel.send("**{}%**.   :scream:".format(round(percentage, 2)))
-  elif percentage < 60:
-      await ctx.channel.send("**{}%**.   :slight_smile:".format(round(percentage, 2)))
-  elif percentage < 80:
-      await ctx.channel.send("**{}%**.   :grinning:".format(round(percentage, 2)))
-  else:
-      await ctx.channel.send("**{}%**.   :star_struck:".format(round(percentage, 2)))
-  #await ctx.channel.send("**{}%**".format(round(percentage, 2)))
-
-
-#----------------------------------------------------------------------------
-#
-#   LES BETISES
-#
-#----------------------------------------------------------------------------
-
-
-@bot.command(name="rale")
-async def rale(ctx):
-  if disabled_guilds == str(ctx.message.guild.id):
-    return
-  await ctx.message.delete()
-  r=Rale()
-  #await ctx.channel.send()
-  embed = discord.Embed(title=r.shout(), color=0xFF5733)
-  embed.set_author(name=ctx.author.display_name+" en a gros", icon_url=ctx.author.avatar_url)
-
-  await ctx.channel.send(embed=embed)
-
-
-@bot.command(name="content")
-async def content(ctx):
-  if disabled_guilds == str(ctx.message.guild.id):
-    return
-  await ctx.message.delete()
-  c=Content()
-  embed = discord.Embed(title=c.happy(), color=0x33CC00)
-  embed.set_author(name=ctx.author.display_name+" est content", icon_url=ctx.author.avatar_url)
-
-  await ctx.channel.send(embed=embed)
-
-@bot.command(name="contente")
-async def contente(ctx):
-  if disabled_guilds == str(ctx.message.guild.id):
-    return
-  await ctx.message.delete()
-  c=Content()
-
-  embed = discord.Embed(title=c.happy(), color=0x33CC00)
-  embed.set_author(name=ctx.author.display_name+" est contente", icon_url=ctx.author.avatar_url)
-
-  await ctx.channel.send(embed=embed)
-
-
-@bot.command(name="fouet")
-async def fouet(ctx):
-  if disabled_guilds == str(ctx.message.guild.id):
-    return
-  await ctx.message.delete()
-  f=Fouet()
-  embed = discord.Embed(title="", color=0xFFCC00)
-  embed.set_author(name=ctx.author.display_name+" te fouette", icon_url=ctx.author.avatar_url)
-  embed.set_image(url=f.fouette())
-
-  await ctx.channel.send(embed=embed)
-
-
-
-@bot.command(name="boude")
-async def boude(ctx):
-  if disabled_guilds == str(ctx.message.guild.id):
-    return
-  await ctx.message.delete()
-  f=Boude()
-  img_url = f.boudeuh()
-  print(img_url)
-  #await ctx.channel.send(f.boudeuh())
-  embed = discord.Embed(title="", color=0xFFCC00)
-  embed.set_author(name=ctx.author.display_name+" boude", icon_url=ctx.author.avatar_url)
-  embed.set_image(url=img_url)
-
-  await ctx.channel.send(embed=embed)
-
-
-@bot.command(name="rencard")
-async def rencard(ctx):
-  if disabled_guilds == str(ctx.message.guild.id):
-    return
-  await ctx.message.delete()
-  r=Rencard()
-  #await ctx.channel.send()
-  embed = discord.Embed(title=r.donot(), color=0xFF5733)
-  embed.set_author(name=ctx.author.display_name+" a son premier rencard depuis un moment", icon_url=ctx.author.avatar_url)
-
-  await ctx.channel.send(embed=embed)
-
-
-
-@bot.command(name="bouquet")
-async def bouquet(ctx):
-  if disabled_guilds == str(ctx.message.guild.id):
-    return
-  await ctx.message.delete()
-  f=Flower()
-  embed = discord.Embed(title="", color=0xFF0000)
-  embed.set_author(name=ctx.author.display_name+" t'offre une zouli fleur", icon_url=ctx.author.avatar_url)
-  embed.set_image(url=f.flowers())
-
-  await ctx.channel.send(embed=embed)
-
-
-#----------------------------------------------------------------------------
-#
-#   LA GESTION DES SALONS
-#
-#----------------------------------------------------------------------------
-
-@bot.command(name="dupliquercategorie")
-async def dupliquercategorie(ctx, *, args):
-
-  await ctx.message.delete()
-
-  arguments = args.split()
-
-  if len(arguments) != 2:
-    await ctx.channel.send("Utilisation : !dupliquercategorie <nom ancienne catégorie> <nom nouvelle catégorie>\nExemple : !dupliquercategorie ancienne nouvelle")
-    return
-  category = get(ctx.guild.categories, name=arguments[0])
-
-  await category.clone(name=arguments[1], reason="duplicate category")
-  await ctx.author.send("Vous avez dupliqué une catégorie")
-
-
-#----------------------------------------------------------------------------
-#
-#   L'AIDE
-#
-#----------------------------------------------------------------------------
-
-@bot.command(name="aide")
-async def aide(ctx):
-  e = discord.Embed(title="Aide")
-  e.add_field(name="Calcul de bracket", value="Calcule votre bracket en fonction du niveau de vos combattants et de votre salle de formation. Exemple de commande:\n**!bracket 100, 90, 81, 81, 81 sdf 9**", inline=False)
-
-  e.add_field(name="Pourcentage sur forge d'ensemble", value="Calcule le pourcentage de bonus sur un ensemble en fonction des valeurs minimum, maximum et réelle d'un attribut. Exemple :\n**!ensemble 100 10000 5000**", inline=False)
-
-  if disabled_guilds != str(ctx.message.guild.id):
-    e.add_field(name="Fouet", value="Fouette. Commande **!fouet**", inline=False)
-    e.add_field(name="Râle", value="Exprime son mécontentement. Commande **!rale**", inline=False)
-    e.add_field(name="Boude", value="Exprime son mécontentement d'une manière plus silencieuse. Commande **!boude**", inline=False)
-    e.add_field(name="Content", value="Exprime un immense plaisir. Commande **!content** ou **!contente**", inline=False)
-    e.add_field(name="Bouquet", value="Pour offrir un pot d'flowers. Commande **!bouquet**", inline=False)
-
-  await ctx.channel.send(embed=e)
-
-
-
-#----------------------------------------------------------------------------
-#
-#   LA GESTION D'ERREUR
-#
-#----------------------------------------------------------------------------
-
-
-@bracket.error
-async def bracket_error(ctx, error):
-  if isinstance(error, commands.MissingPermissions):
-    message = "Vous, ou moi, (le bot), n'avons pas les droits pour exécuter cette commande."
-  elif isinstance(error, commands.MissingRequiredArgument):
-    message = "Il me faut des paramètres. Exemple d'utilisation :\n!bracket 100, 90, 81, 81, 81 sdf 9"
-  else:
-    message = "Arrg! Quelque chose a foiré"
-    traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
-
-  await ctx.author.send(message)
-#----------------------------------------------------------------------------
-@ensemble.error
-async def ensemble_error(ctx, error):
-  if isinstance(error, commands.MissingPermissions):
-    message = "Vous, ou moi, (le bot), n'avons pas les droits pour exécuter cette commande."
-  elif isinstance(error, commands.MissingRequiredArgument):
-    message = "Il me faut des paramètres. Exemple d'utilisation :\n!ensemble <min> <max> <tirage>\nExemple concret : !ensemble 12123 19198 14051"
-  else:
-    message = "Arrg! Quelque chose a foiré"
-
-  await ctx.author.send(message)
 
 create_tables()
-bot.run(token)
-#client.run(token)
