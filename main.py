@@ -9,6 +9,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 import psycopg2
 
+from channelcopy import ChannelCopy
 
 from bracketcompute import BracketCompute
 from rale import Rale
@@ -47,22 +48,68 @@ bot = commands.Bot(command_prefix='!', help_command=None)
 #   Initialisation de la BDD
 #
 #----------------------------------------------------------------------------
-#DATABASE_URL = os.environ['DATABASE_URL']
-#conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+DATABASE_URL = os.environ['DATABASE_URL']
+def create_tables():
+    sqls = (
+        """
+        CREATE TABLE IF NOT EXISTS messages (
+            id SERIAL PRIMARY KEY,
+            channel_id VARCHAR(255) NOT NULL,
+            content VARCHAR(3000) NOT NULL
+        )
+        """,
+    )
 
-#cur = conn.cursor()
-#cur.execute(
-#"""
-#CREATE TABLE IF NOT EXISTS messages (
-#    id SERIAL PRIMARY KEY,
-#    channel_id VARCHAR(255) NOT NULL,
-#    content VARCHAR(3000) NOT NULL
-#)
-#"""
-#)
-#cur.close()
-#conn.commit()
-#conn.close()
+    try:
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        cur = conn.cursor()
+
+        print('PostgreSQL database version:')
+        cur.execute('SELECT version()')
+        db_version = cur.fetchone()
+        print(db_version)
+
+        # create table one by one
+        for sql in sqls:
+            cur.execute(sql)
+        # close communication with the PostgreSQL database server
+        cur.close()
+        # commit the changes
+        conn.commit()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()
+
+
+#----------------------------------------------------------------------------
+#
+#   LA GESTION DES SALONS
+#
+#----------------------------------------------------------------------------
+
+@bot.command(name="copiersalon")
+async def copiersalon(ctx):
+  print(f"{ctx.author.display_name} : copiersalon")
+
+  if ctx.message.guild :
+    await ctx.message.delete()
+  time.sleep(1)
+  c = ChannelCopy()
+  await c.copychannel(ctx.channel, ctx.author)
+  
+#----------------------------------------------------------------------------
+@bot.command(name="collersalon")
+async def collersalon(ctx, *, arg):
+  print(f"{ctx.author.display_name} : collersalon")
+  #if ctx.message.guild :
+  #  await ctx.message.delete()
+  #  time.sleep(1)
+  c = ChannelCopy()
+  await c.pastechannel(ctx.channel, ctx.author, arg)
+
+
 #----------------------------------------------------------------------------
 #
 #   CALCUL DU BRACKET
@@ -247,9 +294,9 @@ async def bouquet(ctx):
 
 @bot.command(name="dupliquercategorie")
 async def dupliquercategorie(ctx, *, args):
-  
+
   await ctx.message.delete()
-  
+
   arguments = args.split()
 
   if len(arguments) != 2:
@@ -315,6 +362,6 @@ async def ensemble_error(ctx, error):
 
   await ctx.author.send(message)
 
-
+create_tables()
 bot.run(token)
 #client.run(token)
