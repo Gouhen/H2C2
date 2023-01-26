@@ -9,7 +9,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from dotenv import load_dotenv
-import psycopg2
+#import psycopg2
 
 #from channelcopy import ChannelCopy
 
