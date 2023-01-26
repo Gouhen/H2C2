@@ -274,12 +274,12 @@ client.run(token)
         # db_version = cur.fetchone()
         # print(db_version)
 
-        create table one by one
+#        create table one by one
         # for sql in sqls:
             # cur.execute(sql)
-        close communication with the PostgreSQL database server
+#        close communication with the PostgreSQL database server
         # cur.close()
-        commit the changes
+#        commit the changes
         # conn.commit()
     # except (Exception, psycopg2.DatabaseError) as error:
         # print(error)
