@@ -11,7 +11,7 @@ from discord import app_commands
 from dotenv import load_dotenv
 import psycopg2
 
-from channelcopy import ChannelCopy
+#from channelcopy import ChannelCopy
 
 from bracketcompute import BracketCompute
 from rale import Rale
@@ -205,43 +205,43 @@ async def self(interaction: discord.Interaction, min:int, max:int, value:int):
 #----------------------------------------------------------------------------
 
 
-@tree.command(name = "copiersalon", description="Copier les 50 derniers messages du salon", )
-async def self(interaction: discord.Interaction):
+# @tree.command(name = "copiersalon", description="Copier les 50 derniers messages du salon", )
+# async def self(interaction: discord.Interaction):
 
-    if not interaction.user.guild_permissions.manage_channels:
-        await interaction.response.send_message("Vous n'avez pas les droits pour utiliser cette commande", ephemeral=True)
-        return
+    # if not interaction.user.guild_permissions.manage_channels:
+        # await interaction.response.send_message("Vous n'avez pas les droits pour utiliser cette commande", ephemeral=True)
+        # return
 
-    c = ChannelCopy()
-    await c.copychannel(interaction)
-
-
-@tree.command(name = "collersalon", description="Copier les 50 derniers messages du salon", )
-@app_commands.rename(room_id='identifiant')
-@app_commands.describe(room_id='identifiant du salon copié préalablement')
-async def self(interaction: discord.Interaction, room_id:int):
+    # c = ChannelCopy()
+    # await c.copychannel(interaction)
 
 
-    if not interaction.user.guild_permissions.manage_channels:
-        await interaction.response.send_message("Vous n'avez pas les droits pour utiliser cette commande", ephemeral=True)
-        return
-
-    c = ChannelCopy()
-    await c.pastechannel(interaction, room_id)
+# @tree.command(name = "collersalon", description="Copier les 50 derniers messages du salon", )
+# @app_commands.rename(room_id='identifiant')
+# @app_commands.describe(room_id='identifiant du salon copié préalablement')
+# async def self(interaction: discord.Interaction, room_id:int):
 
 
+    # if not interaction.user.guild_permissions.manage_channels:
+        # await interaction.response.send_message("Vous n'avez pas les droits pour utiliser cette commande", ephemeral=True)
+        # return
 
-@tree.command(name = "dupliquercategorie", description="Duplique une catégorie existante, avec les droits et tout", )
-async def self(interaction: discord.Interaction, categorie_existante:str, nom_nouvelle_categorie:str):
+    # c = ChannelCopy()
+    # await c.pastechannel(interaction, room_id)
 
-    if not interaction.user.guild_permissions.manage_channels:
-        await interaction.response.send_message("Vous n'avez pas les droits pour utiliser cette commande", ephemeral=True)
-        return
 
-    category = get(interaction.guild.categories, name=categorie_existante)
 
-    await category.clone(name=nom_nouvelle_categorie, reason="duplicate category")
-    await interaction.response.send_message("Vous avez dupliqué une catégorie", ephemeral=True)
+# @tree.command(name = "dupliquercategorie", description="Duplique une catégorie existante, avec les droits et tout", )
+# async def self(interaction: discord.Interaction, categorie_existante:str, nom_nouvelle_categorie:str):
+
+    # if not interaction.user.guild_permissions.manage_channels:
+        # await interaction.response.send_message("Vous n'avez pas les droits pour utiliser cette commande", ephemeral=True)
+        # return
+
+    # category = get(interaction.guild.categories, name=categorie_existante)
+
+    # await category.clone(name=nom_nouvelle_categorie, reason="duplicate category")
+    # await interaction.response.send_message("Vous avez dupliqué une catégorie", ephemeral=True)
 
 
 
@@ -253,41 +253,41 @@ client.run(token)
 #   Initialisation de la BDD
 #
 #----------------------------------------------------------------------------
-DATABASE_URL = os.environ['DATABASE_URL']
-def create_tables():
-    sqls = (
-        """
-        CREATE TABLE IF NOT EXISTS messages (
-            id SERIAL PRIMARY KEY,
-            channel_id VARCHAR(255) NOT NULL,
-            content VARCHAR(3000) NOT NULL
-        )
-        """,
-    )
+# DATABASE_URL = os.environ['DATABASE_URL']
+# def create_tables():
+    # sqls = (
+        # """
+        # CREATE TABLE IF NOT EXISTS messages (
+            # id SERIAL PRIMARY KEY,
+            # channel_id VARCHAR(255) NOT NULL,
+            # content VARCHAR(3000) NOT NULL
+        # )
+        # """,
+    # )
 
-    try:
-        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-        cur = conn.cursor()
+    # try:
+        # conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        # cur = conn.cursor()
 
-        print('PostgreSQL database version:')
-        cur.execute('SELECT version()')
-        db_version = cur.fetchone()
-        print(db_version)
+        # print('PostgreSQL database version:')
+        # cur.execute('SELECT version()')
+        # db_version = cur.fetchone()
+        # print(db_version)
 
-        # create table one by one
-        for sql in sqls:
-            cur.execute(sql)
-        # close communication with the PostgreSQL database server
-        cur.close()
-        # commit the changes
-        conn.commit()
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-    finally:
-        if conn is not None:
-            conn.close()
-
-
+        create table one by one
+        # for sql in sqls:
+            # cur.execute(sql)
+        close communication with the PostgreSQL database server
+        # cur.close()
+        commit the changes
+        # conn.commit()
+    # except (Exception, psycopg2.DatabaseError) as error:
+        # print(error)
+    # finally:
+        # if conn is not None:
+            # conn.close()
 
 
-create_tables()
+
+
+# create_tables()
