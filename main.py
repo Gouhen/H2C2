@@ -19,7 +19,8 @@ my_secret = os.environ['DA_TOKEN']
 
 #result = ""
 
-bot = commands.Bot(command_prefix='!', help_command=None)
+intents = discord.Intents.default()
+bot = commands.Bot(command_prefix='!', help_command=None, intents=intents)
 #slash = SlashCommand(bot, sync_commands=True)
 
 
